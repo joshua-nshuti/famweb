@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About - Josh Family</title>
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: url("background.jpg") no-repeat center/cover;
+    background-attachment: fixed;
+    position: relative;
+    color: rgba(255,255,255,0.9);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.8); /* 🔥 brightness reduction */
+    z-index: -1;
+    color: rgba(255,255,255,0.9);
+}
+
+.hero {
+    text-align: center;
+    padding: 100px 20px;
+    animation: fadeIn 2s ease;
+}
+
+.hero h1 {
+    font-size: 50px;
+}
+
+.hero p {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px;
+}
+
+.glass {
+    width: 80%;
+    padding: 30px;
+
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+
+    animation: slideUp 1s ease;
+}
+
+.values {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    padding: 20px;
+    border-radius: 15px;
+
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.1);
+}
+
+.gallery {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.gallery img {
+    height: 150px;
+    object-fit: cover;
+}
+
+.gallery img:hover {
+    transform: scale(1.1);
+}
+
+.gallery img {
+    transition: 0.3s;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: rgba(0,0,0,0.5);
+}
+
+.stats h2 {
+    font-size: 30px;
+}
+
+.quote {
+    text-align: center;
+    font-style: italic;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .glass {
+        width: 95%;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    p {
+        font-size: 15px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    background: green;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+    <nav style="display:flex; justify-content:space-between; align-items:center;">
+
+    <div style="display:flex; gap:20px; align-items:center;">
+        <a href="privacy.html" style="color:yellow; text-decoration:none;">
+            Privacy Policy
+        </a>
+    </div>
+
+</nav>
+
+
+<section class="hero">
+    <p id="userEmail"></p>
+    <h1>About Our Family</h1>
+    <p>United by love, growing together forever ❤️</p>
+</section>
+
+<nav>
+  <h2>Josh Family</h2>
+  <p id="userEmail"></p>
+  <button onclick="goBack()">Home</button>
+</nav>
+
+<div class="container">
+
+    <div class="glass">
+        <h2>Our Story</h2>
+        <p>
+            Our family is built on unity, respect, and love. We support each other,
+            celebrate together, and grow stronger every day.
+        </p>
+    </div>
+
+    <div class="glass">
+        <h2>Our Values</h2>
+        <div class="values">
+            <div class="card">❤️ Love</div>
+            <div class="card">🤝 Unity</div>
+            <div class="card">🌟 Respect</div>
+        </div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="glass">
+        <h2>Gallery</h2>
+        <div class="gallery">
+            <img src="dady.jpg">
+            <img src="mammy.jpg">
+            <img src="jean-dedieu.jpg">
+            <img src="xavier.jpg">
+            <img src="vedaste.jpg">
+            <img src="joselyne.jpg">
+            <img src="joshua.jpg">
+            <img src="diane.jpg">
+            <img src="josue.jpg">
+            <img src="jojo.jpg">
+        </div>
+    </div>
+
+    <div class="glass stats">
+        <div>
+            <h2>8+</h2>
+            <p>Members</p>
+        </div>
+        <div>
+            <h2>29+</h2>
+            <p>Years Together</p>
+        </div>
+    </div>
+
+    <div class="glass quote">
+        <p>"Family is where life begins and love never ends."</p>
+    </div>
+
+    <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUgbG6HIZtNLd1hQUYFQ0HMCX-T9lRK68",
+  authDomain: "blessed-family.firebaseapp.com",
+  projectId: "blessed-family",
+  storageBucket: "blessed-family.firebasestorage.app",
+  messagingSenderId: "740317421666",
+  appId: "1:740317421666:web:3431d27fc2db835b5e713b",
+  measurementId: "G-M3YRREWX6F"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        document.getElementById("userEmail").innerText = user.email;
+    }
+});
+
+window.goBack = function() {
+    window.location.href = "index.html";
+};
+
+</script>
+
+
+</div>
+
+<footer>
+    <p>© 2026 Josh Family</p>
+    <p>for more imfo call: joshuanshuti033@gmail.com</p>
+</footer>
+
+</body>
+</html>

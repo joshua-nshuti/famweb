@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Family Members</title>
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    padding: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+#commentsPanel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: #111;
+    display: none;
+    flex-direction: column;
+}
+
+#commentsList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.comment {
+    background: rgba(255,255,255,0.1);
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 10px;
+}
+
+.commentBox {
+    display: flex;
+    padding: 10px;
+}
+
+.commentBox input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+.commentBox button {
+    margin-left: 10px;
+    padding: 10px;
+    background: #00c6ff;
+    border: none;
+    border-radius: 10px;
+    color: white;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>👨‍👩‍👧 Family Members</h1>
+
+<div class="grid">
+
+<div class="card" onclick="openComments('dady')">
+    <img src="dady.jpg">
+    <h3>Dady</h3>
+</div>
+
+<div class="card" onclick="openComments('mammy')">
+    <img src="mammy.jpg">
+    <h3>Mammy</h3>
+</div>
+
+<div class="card" onclick="openComments('jean-dedieu')">
+    <img src="jean-dedieu.jpg">
+    <h3>D.jd</h3>
+</div>
+
+<div class="card" onclick="openComments('xavier')">
+    <img src="xavier.jpg">
+    <h3>H.xavier</h3>
+</div>
+
+<div class="card" onclick="openComments('vedaste')">
+    <img src="vedaste.jpg">
+    <h3>T.veda</h3>
+</div>
+
+<div class="card" onclick="openComments('joselyne')">
+    <img src="joselyne.jpg">
+    <h3>U.jose</h3>
+</div>
+
+<div class="card" onclick="openComments('joshua')">
+    <img src="joshua.jpg">
+    <h3>Joshua</h3>
+</div>
+
+<div class="card" onclick="openComments('kamikazi')">
+    <img src="diane.jpg">
+    <h3>K.diane</h3>
+</div>
+
+</div>
+
+<div id="commentsPanel">
+
+<div style="padding:10px;">
+    <button onclick="closeComments()">⬅ Close</button>
+</div>
+
+<div id="commentsList"></div>
+
+<div class="commentBox">
+    <input id="commentInput" placeholder="Write comment...">
+    <button onclick="sendComment()">Send</button>
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUgbG6HIZtNLd1hQUYFQ0HMCX-T9lRK68",
+  authDomain: "blessed-family.firebaseapp.com",
+  projectId: "blessed-family"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentPerson = null;
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        currentUser = user;
+    }
+});
+
+window.openComments = function(person){
+
+    currentPerson = person;
+
+    document.getElementById("commentsPanel").style.display = "flex";
+
+    loadComments();
+}
+
+window.closeComments = function(){
+    document.getElementById("commentsPanel").style.display = "none";
+}
+
+window.sendComment = async function(){
+
+    let input = document.getElementById("commentInput");
+    let button = document.querySelector(".commentBox button");
+
+    let text = input.value.trim();
+
+    if(!text){
+        alert("Write something first!");
+        return;
+    }
+
+    try {
+        input.disabled = true;
+        button.disabled = true;
+        button.innerText = "Sending...";
+
+        await addDoc(collection(db, "comments", currentPerson, "messages"), {
+            text: text,
+            user: currentUser.email,
+            time: serverTimestamp()
+        });
+
+        input.value = "";
+
+    } catch (err) {
+        alert(err.message);
+    }
+
+    input.disabled = false;
+    button.disabled = false;
+    button.innerText = "Send";
+}
+
+function loadComments(){
+
+    const q = query(
+        collection(db, "comments", currentPerson, "messages"),
+        orderBy("time")
+    );
+
+    onSnapshot(q, (snapshot) => {
+
+        let list = document.getElementById("commentsList");
+        list.innerHTML = "";
+
+        snapshot.forEach(doc => {
+
+            let c = doc.data();
+
+            list.innerHTML += `
+                <div class="comment">
+                    <b>${c.user}</b><br>
+                    ${c.text}
+                </div>
+            `;
+        });
+
+        list.scrollTop = list.scrollHeight;
+    });
+}
+
+</script>
+
+<footer>
+    <p>© 2026 Josh Family</p>
+    <p>for more imfo call: joshuanshuti033@gmail.com</p>
+</footer>
+
+</body>
+</html>

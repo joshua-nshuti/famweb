@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Page</title>
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(120deg, #1e3c72, #2a5298);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 15px;
+    width: 320px;
+    backdrop-filter: blur(10px);
+    color: white;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    background: #00c6ff;
+    color: white;
+    cursor: pointer;
+}
+
+.switch {
+    text-align: center;
+    color: yellow;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    p {
+        font-size: 15px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2 id="title">Login</h2>
+
+<!-- LOGIN -->
+<div id="loginForm">
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- SIGNUP -->
+<div id="signupForm" style="display:none;">
+    <input type="email" id="signupEmail" placeholder="Email">
+    <input type="password" id="signupPass" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+</div>
+
+<div class="switch" onclick="toggleForm()">
+    Switch Login / Signup
+</div>
+
+</div>
+
+<!-- 🔥 Firebase Script -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUgbG6HIZtNLd1hQUYFQ0HMCX-T9lRK68",
+  authDomain: "blessed-family.firebaseapp.com",
+  projectId: "blessed-family",
+  storageBucket: "blessed-family.firebasestorage.app",
+  messagingSenderId: "740317421666",
+  appId: "1:740317421666:web:3431d27fc2db835b5e713b",
+  measurementId: "G-M3YRREWX6F"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// AUTO LOGIN CHECK
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        window.location.href = "index.html";
+    }
+});
+
+// TOGGLE
+window.toggleForm = function(){
+    let login = document.getElementById("loginForm");
+    let signup = document.getElementById("signupForm");
+    let title = document.getElementById("title");
+
+    if(login.style.display === "none"){
+        login.style.display = "block";
+        signup.style.display = "none";
+        title.innerText = "Login";
+    } else {
+        login.style.display = "none";
+        signup.style.display = "block";
+        title.innerText = "Sign Up";
+    }
+}
+
+// SIGNUP
+window.signup = function(){
+    let email = document.getElementById("signupEmail").value;
+    let pass = document.getElementById("signupPass").value;
+
+    if(email === "" || pass === ""){
+        alert("Fill all fields");
+        return;
+    }
+
+    if(pass.length < 6){
+        alert("Password must be at least 6 characters");
+        return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, pass)
+    .then(() => {
+        alert("Account created!");
+        toggleForm();
+    })
+    .catch(err => alert(err.message));
+}
+
+// LOGIN
+window.login = function(){
+    let email = document.getElementById("loginEmail").value;
+    let pass = document.getElementById("loginPass").value;
+
+    if(email === "" || pass === ""){
+        alert("Fill all fields");
+        return;
+    }
+
+    signInWithEmailAndPassword(auth, email, pass)
+    .then(() => {
+        window.location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
+}
+
+</script>
+
+<footer>
+    <p>© 2026 Josh Family</p>
+    <p>for more imfo call: joshuanshuti033@gmail.com</p>
+</footer>
+
+</body>
+</html>
