@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Profile</title>
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    padding: 30px;
+}
+
+.card {
+    max-width: 400px;
+    margin: auto;
+    padding: 25px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: none;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #00c6ff;
+    color: white;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: orange;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="avatar" id="avatar">?</div>
+
+<h2 id="email"></h2>
+
+<input type="text" id="name" placeholder="Your Name">
+<textarea id="bio" placeholder="Your Bio"></textarea>
+
+<button onclick="saveProfile()">Save Profile</button>
+<br><br>
+<button onclick="goBack()">⬅ Back</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUgbG6HIZtNLd1hQUYFQ0HMCX-T9lRK68",
+  authDomain: "blessed-family.firebaseapp.com",
+  projectId: "blessed-family",
+  storageBucket: "blessed-family.firebasestorage.app",
+  messagingSenderId: "740317421666",
+  appId: "1:740317421666:web:3431d27fc2db835b5e713b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+// 🔐 CHECK LOGIN
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        currentUser = user;
+
+        document.getElementById("email").innerText = user.email;
+
+        // avatar
+        let letter = user.email.charAt(0).toUpperCase();
+        document.getElementById("avatar").innerText = letter;
+
+        // LOAD DATA
+        const docRef = doc(db, "users", user.uid);
+        const snap = await getDoc(docRef);
+
+        if(snap.exists()){
+            let data = snap.data();
+            document.getElementById("name").value = data.name || "";
+            document.getElementById("bio").value = data.bio || "";
+        }
+    }
+});
+
+// 💾 SAVE PROFILE
+window.saveProfile = async function(){
+
+    const name = document.getElementById("name").value;
+    const bio = document.getElementById("bio").value;
+
+    await setDoc(doc(db, "users", currentUser.uid), {
+        name: name,
+        bio: bio,
+        email: currentUser.email
+    });
+
+    alert("Profile saved!");
+}
+
+// 🔙 BACK
+window.goBack = function(){
+    window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
