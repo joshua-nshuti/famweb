@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Gallery</title>
+
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(255,255,255,0.1);
+}
+
+header h2 {
+    margin: 0;
+}
+
+header button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: red;
+    color: white;
+    cursor: pointer;
+}
+
+/* CONTAINER */
+.container {
+    padding: 20px;
+}
+
+/* INPUT AREA */
+.uploadBox {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.uploadBox input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.uploadBox button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #00c6ff;
+    color: white;
+    cursor: pointer;
+}
+
+/* PREVIEW */
+#preview {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: none;
+    margin-bottom: 10px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 15px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.card p {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #ccc;
+}
+
+@keyframes fadeIn {
+    from {opacity:0; transform:translateY(20px);}
+    to {opacity:1; transform:translateY(0);}
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .container{
+        padding:10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>📸 Family Gallery</h2>
+    <button onclick="goBack()">⬅ Back</button>
+</header>
+
+<div class="container">
+
+    <!-- UPLOAD BOX -->
+    <div class="uploadBox">
+        <input type="text" id="imageUrl" placeholder="Paste image URL (https://...)">
+        <img id="preview">
+        <button onclick="uploadImage()">Upload</button>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="grid" id="gallery"></div>
+
+</div>
+
+<!-- 🔥 FIREBASE -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// 🔑 CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyBUgbG6HIZtNLd1hQUYFQ0HMCX-T9lRK68",
+  authDomain: "blessed-family.firebaseapp.com",
+  projectId: "blessed-family",
+  storageBucket: "blessed-family.firebasestorage.app",
+  messagingSenderId: "740317421666",
+  appId: "1:740317421666:web:3431d27fc2db835b5e713b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+// 🔐 AUTH CHECK
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+    } else {
+        currentUser = user;
+        loadImages();
+    }
+});
+
+// 📸 PREVIEW
+document.getElementById("imageUrl").addEventListener("input", function(){
+    const url = this.value;
+    const img = document.getElementById("preview");
+
+    if(url.startsWith("http")){
+        img.src = url;
+        img.style.display = "block";
+    } else {
+        img.style.display = "none";
+    }
+});
+
+// 📤 UPLOAD (URL SYSTEM)
+window.uploadImage = async function(){
+
+    const url = document.getElementById("imageUrl").value;
+
+    if(!url){
+        alert("Paste image URL");
+        return;
+    }
+
+    if(!url.startsWith("http")){
+        alert("Invalid link");
+        return;
+    }
+
+    await addDoc(collection(db, "gallery"), {
+        imageUrl: url,
+        user: currentUser.email,
+        time: Date.now()
+    });
+
+    document.getElementById("imageUrl").value = "";
+    document.getElementById("preview").style.display = "none";
+
+}
+
+// 📥 REALTIME LOAD
+function loadImages(){
+
+    const q = query(collection(db, "gallery"), orderBy("time"));
+
+    onSnapshot(q, (snapshot) => {
+
+        const gallery = document.getElementById("gallery");
+        gallery.innerHTML = "";
+
+        snapshot.forEach(doc => {
+            let data = doc.data();
+
+            gallery.innerHTML += `
+                <div class="card">
+                    <img src="${data.imageUrl}">
+                    <p>By: ${data.user}</p>
+                </div>
+            `;
+        });
+
+    });
+}
+
+// 🔙 BACK
+window.goBack = function(){
+    window.location.href = "index.html";
+};
+
+</script>
+
+</body>
+</html>
